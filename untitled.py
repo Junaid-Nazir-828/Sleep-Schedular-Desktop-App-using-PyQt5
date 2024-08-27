@@ -9,9 +9,11 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtWidgets import QMessageBox
 import os
 import sqlite3
 import utils
+import crud
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -50,7 +52,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout.addLayout(self.horizontalLayout_7)
         self.horizontalLayout_3 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_3.setObjectName("horizontalLayout_3")
-        self.add_button = QtWidgets.QPushButton(self.centralwidget)
+        self.add_button = QtWidgets.QPushButton(self.centralwidget, clicked = lambda : self.add_new_time())
         font = QtGui.QFont()
         font.setFamily("Bahnschrift Light SemiCondensed")
         font.setPointSize(10)
@@ -76,7 +78,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout_2.addLayout(self.horizontalLayout_9)
         self.horizontalLayout_8 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_8.setObjectName("horizontalLayout_8")
-        self.delete_button = QtWidgets.QPushButton(self.centralwidget)
+        self.delete_button = QtWidgets.QPushButton(self.centralwidget, clicked = lambda : self.delete_time())
         font = QtGui.QFont()
         font.setFamily("Bahnschrift Light SemiCondensed")
         font.setPointSize(10)
@@ -104,11 +106,67 @@ class Ui_MainWindow(object):
         self.delete_button.setText(_translate("MainWindow", "Delete"))
 
     def __on_start(self):
-        hours = ['','1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24']
-        minutes = ['','1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', '26', '27', '28', '29', '30', '31', '32', '33', '34', '35', '36', '37', '38', '39', '40', '41', '42', '43', '44', '45', '46', '47', '48', '49', '50', '51', '52', '53', '54', '55', '56', '57', '58', '59', '60']
+        hours = ['','01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24']
+        minutes = ['','01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', '26', '27', '28', '29', '30', '31', '32', '33', '34', '35', '36', '37', '38', '39', '40', '41', '42', '43', '44', '45', '46', '47', '48', '49', '50', '51', '52', '53', '54', '55', '56', '57', '58', '59', '60']
         self.hours.addItems(hours)
         self.minutes.addItems(minutes)
 
+        # create database for storing time
+        db_path = utils.get_database_path()
+        conn = sqlite3.connect(db_path)
+        cursor = conn.cursor()
+        
+        # Create table if not exists
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS sleep_schedular (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                hours INTEGER NOT NULL,
+                minutes INTEGER NOT NULL
+            )
+        ''')
+        
+        conn.commit()
+        conn.close()
+
+        self.show_times.addItem('')
+        list_of_times = crud.get_formatted_times()
+        if list_of_times:
+            self.show_times.addItems(list_of_times)
+
+    def add_new_time(self):
+        if self.hours.currentText() and self.minutes.currentText():
+            try:
+                crud.insert_sleep_schedule(int(self.hours.currentText()),int(self.minutes.currentText()))
+            except:
+                QMessageBox.critical(None,'ERROR','Failed to insert new time')
+            else:
+                # list_of_times = crud.get_formatted_times()
+                # if list_of_times:
+                #     self.show_times.clear()
+                #     self.show_times.addItem('')
+                #     self.show_times.addItems(list_of_times)
+                self.show_times.addItem(f'{self.hours.currentText()}:{self.minutes.currentText()}')
+                self.hours.setCurrentIndex(0)
+                self.minutes.setCurrentIndex(0)
+                QMessageBox.information(None,'ERROR','New time added')
+        else:
+            QMessageBox.critical(None,'ERROR','Please select the desired time')
+
+    def delete_time(self):
+        if self.show_times.currentText():
+            try:
+                hour,min = self.show_times.currentText().split(':')
+                print(hour)
+                print(min)
+                crud.delete_sleep_schedule_by_time(hour,min)
+            except:
+                QMessageBox.critical(None,'ERROR','Failed to delete selected time')
+            else:
+                current_index = self.show_times.currentIndex()
+                if current_index != -1:  # Ensure there is a valid selected item
+                    self.show_times.removeItem(current_index)
+        else:
+            QMessageBox.critical(None,'ERROR','Please select the desired time')
 
 if __name__ == "__main__":
     import sys

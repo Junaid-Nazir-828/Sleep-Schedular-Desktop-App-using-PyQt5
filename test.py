@@ -6,11 +6,17 @@
 # print(time_now.hour)
 # print(type(time_now.hour)) # int
 
-import os
+# import os
 
-def get_machine_name():
-    return os.getlogin()
+# def get_machine_name():
+#     return os.getlogin()
 
 if __name__ == '__main__':
-    print(get_machine_name())
-    print(type(get_machine_name())) # str
+    # print(get_machine_name())
+    # print(type(get_machine_name())) # str
+
+    # ab = ''
+    # if ab:
+    #     print('not empt')
+    # else:
+    #     print('empty')

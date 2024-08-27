@@ -1,10 +1,10 @@
 import os
 from pathlib import Path
 
-def get_logged_in_username(self):
+def get_logged_in_username():
         return os.getlogin()
 
-def get_database_path(self):
+def get_database_path():
     machine_name = get_logged_in_username()
     base_path = Path(f"C:/Users/{machine_name}/Documents")
     database_path = base_path / "sleep_schedular.db"
