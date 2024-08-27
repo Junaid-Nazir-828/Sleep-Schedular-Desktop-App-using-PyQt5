@@ -67,6 +67,6 @@ def get_formatted_times():
     conn.close()
 
     # Format the times as 'H:MM' and return them as a list
-    formatted_times = [f'{hour}:{minute:02d}' for hour, minute in rows]
+    formatted_times = [f'{hour}:{minute}' for hour, minute in rows]
     
     return formatted_times

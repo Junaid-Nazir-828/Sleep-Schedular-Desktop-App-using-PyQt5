@@ -18,7 +18,7 @@ import crud
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(497, 361)
+        MainWindow.setFixedSize(497, 361)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.horizontalLayout_10 = QtWidgets.QHBoxLayout(self.centralwidget)
@@ -120,8 +120,8 @@ class Ui_MainWindow(object):
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS sleep_schedular (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                hours INTEGER NOT NULL,
-                minutes INTEGER NOT NULL
+                hours TEXT NOT NULL,
+                minutes TEXT NOT NULL
             )
         ''')
         
@@ -136,19 +136,14 @@ class Ui_MainWindow(object):
     def add_new_time(self):
         if self.hours.currentText() and self.minutes.currentText():
             try:
-                crud.insert_sleep_schedule(int(self.hours.currentText()),int(self.minutes.currentText()))
+                crud.insert_sleep_schedule(self.hours.currentText(),self.minutes.currentText())
             except:
                 QMessageBox.critical(None,'ERROR','Failed to insert new time')
             else:
-                # list_of_times = crud.get_formatted_times()
-                # if list_of_times:
-                #     self.show_times.clear()
-                #     self.show_times.addItem('')
-                #     self.show_times.addItems(list_of_times)
                 self.show_times.addItem(f'{self.hours.currentText()}:{self.minutes.currentText()}')
                 self.hours.setCurrentIndex(0)
                 self.minutes.setCurrentIndex(0)
-                QMessageBox.information(None,'ERROR','New time added')
+                QMessageBox.information(None,'INFO','New time added')
         else:
             QMessageBox.critical(None,'ERROR','Please select the desired time')
 
@@ -156,8 +151,6 @@ class Ui_MainWindow(object):
         if self.show_times.currentText():
             try:
                 hour,min = self.show_times.currentText().split(':')
-                print(hour)
-                print(min)
                 crud.delete_sleep_schedule_by_time(hour,min)
             except:
                 QMessageBox.critical(None,'ERROR','Failed to delete selected time')
@@ -165,6 +158,8 @@ class Ui_MainWindow(object):
                 current_index = self.show_times.currentIndex()
                 if current_index != -1:  # Ensure there is a valid selected item
                     self.show_times.removeItem(current_index)
+                self.show_times.setCurrentIndex(0)
+                QMessageBox.information(None,'INFO','Removed selected time')
         else:
             QMessageBox.critical(None,'ERROR','Please select the desired time')
 
