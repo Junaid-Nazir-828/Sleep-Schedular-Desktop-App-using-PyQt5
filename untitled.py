@@ -17,6 +17,7 @@ import crud
 import time
 from datetime import datetime
 import threading
+import psutil
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -169,15 +170,19 @@ class Ui_MainWindow(object):
             QMessageBox.critical(None,'ERROR','Please select the desired time')
 
     def check_time_against_database(self):
-        
-        while True:
-            formatted_times = crud.get_formatted_times()
-            current_time = datetime.now().strftime('%H:%M')
-            # Compare the current time with times in the database
-            if current_time in formatted_times:
-                os.system("Rundll32.exe Powrprof.dll,SetSuspendState Sleep")
-                break
-            time.sleep(50)
+        # Get the names of all running processes
+        process_names = [proc.name() for proc in psutil.process_iter(['name'])]
+
+        # Print the names of the processes
+        if 'Sleepy.exe' not in process_names:
+            while True:
+                formatted_times = crud.get_formatted_times()
+                current_time = datetime.now().strftime('%H:%M')
+                # Compare the current time with times in the database
+                if current_time in formatted_times:
+                    os.system("Rundll32.exe Powrprof.dll,SetSuspendState Sleep")
+                    break
+                time.sleep(50)
 
 if __name__ == "__main__":
     import sys
