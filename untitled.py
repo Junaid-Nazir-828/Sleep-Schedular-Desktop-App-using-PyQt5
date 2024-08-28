@@ -106,7 +106,7 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "Sleep Schedular - www.fiverr.com/code_of_duty"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "Sleepy - www.fiverr.com/code_of_duty"))
         self.add_button.setText(_translate("MainWindow", "Add"))
         self.delete_button.setText(_translate("MainWindow", "Delete"))
 
@@ -176,6 +176,7 @@ class Ui_MainWindow(object):
             # Compare the current time with times in the database
             if current_time in formatted_times:
                 os.system("Rundll32.exe Powrprof.dll,SetSuspendState Sleep")
+                break
             time.sleep(50)
 
 if __name__ == "__main__":
