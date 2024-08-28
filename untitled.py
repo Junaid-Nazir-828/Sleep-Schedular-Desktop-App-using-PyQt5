@@ -14,6 +14,9 @@ import os
 import sqlite3
 import utils
 import crud
+import time
+from datetime import datetime
+import threading
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -98,10 +101,12 @@ class Ui_MainWindow(object):
 
         # additionals
         self.__on_start()
+        t = threading.Thread(target=self.check_time_against_database)
+        t.start()
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "Sleep Schedular"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "Sleep Schedular - www.fiverr.com/code_of_duty"))
         self.add_button.setText(_translate("MainWindow", "Add"))
         self.delete_button.setText(_translate("MainWindow", "Delete"))
 
@@ -162,6 +167,16 @@ class Ui_MainWindow(object):
                 QMessageBox.information(None,'INFO','Removed selected time')
         else:
             QMessageBox.critical(None,'ERROR','Please select the desired time')
+
+    def check_time_against_database(self):
+        
+        while True:
+            formatted_times = crud.get_formatted_times()
+            current_time = datetime.now().strftime('%H:%M')
+            # Compare the current time with times in the database
+            if current_time in formatted_times:
+                os.system("Rundll32.exe Powrprof.dll,SetSuspendState Sleep")
+            time.sleep(50)
 
 if __name__ == "__main__":
     import sys

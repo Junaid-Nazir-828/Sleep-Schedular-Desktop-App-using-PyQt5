@@ -1,7 +1,7 @@
 # import os
 # os.system("Rundll32.exe Powrprof.dll,SetSuspendState Sleep")
 
-# import datetime
+from datetime import datetime
 # time_now = datetime.datetime.now()
 # print(time_now.hour)
 # print(type(time_now.hour)) # int
@@ -20,3 +20,5 @@ if __name__ == '__main__':
     #     print('not empt')
     # else:
     #     print('empty')
+    current_time = datetime.now().strftime('%H:%M')
+    print(type(current_time))
